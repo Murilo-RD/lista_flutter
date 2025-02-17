@@ -19,7 +19,7 @@ class TodoListItem extends StatelessWidget {
         motion: ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: this,
+            onPressed: null,
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
