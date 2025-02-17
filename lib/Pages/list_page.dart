@@ -21,7 +21,7 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.black12,
+        backgroundColor: Colors.black,
         body: Center(
             child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 50),
