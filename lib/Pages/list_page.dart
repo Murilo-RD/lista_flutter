@@ -12,10 +12,23 @@ class ListPage extends StatefulWidget {
   State<ListPage> createState() => _ListPageState();
 }
 
+
 class _ListPageState extends State<ListPage> {
   final TextEditingController todosController = TextEditingController();
 
   List<Todo> todos = [];
+
+  void todoAdd() {
+    String text = todosController.text;
+    if(todosController.text.isNotEmpty){
+      setState(() {
+        Todo newTodo = Todo(title: text, date: DateTime.now());
+        todos.add(newTodo);
+      });
+      todosController.clear();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +45,16 @@ class _ListPageState extends State<ListPage> {
                 children: [
                   Expanded(
                     child: TextField(
+                      onSubmitted: (String value){
+                        if(value.isNotEmpty) {
+                          setState(() {
+                            Todo newTodo = Todo(
+                                title: value, date: DateTime.now());
+                            todos.add(newTodo);
+                            todosController.clear();
+                          });
+                        }
+                      },
                       controller: todosController,
                       style: TextStyle(color: Colors.white54),
                       decoration: InputDecoration(
@@ -52,16 +75,7 @@ class _ListPageState extends State<ListPage> {
                     width: 8,
                   ),
                   ElevatedButton(
-                      onPressed: () {
-                        String text = todosController.text;
-                        if(todosController.text.isNotEmpty){
-                        setState(() {
-                          Todo newTodo = Todo(title: text, date: DateTime.now());
-                          todos.add(newTodo);
-                        });
-                        todosController.clear();
-                        }
-                      },
+                      onPressed: todoAdd,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.purple,
                         padding: EdgeInsets.all(14),
