@@ -6,12 +6,11 @@ import '../Models/todo.dart';
 import '../widgets/todo_list_item.dart';
 
 class ListPage extends StatefulWidget {
-  ListPage({super.key});
+  const ListPage({super.key});
 
   @override
   State<ListPage> createState() => _ListPageState();
 }
-
 
 class _ListPageState extends State<ListPage> {
   final TextEditingController todosController = TextEditingController();
@@ -20,7 +19,7 @@ class _ListPageState extends State<ListPage> {
 
   void todoAdd() {
     String text = todosController.text;
-    if(todosController.text.isNotEmpty){
+    if (todosController.text.isNotEmpty) {
       setState(() {
         Todo newTodo = Todo(title: text, date: DateTime.now());
         todos.add(newTodo);
@@ -29,6 +28,11 @@ class _ListPageState extends State<ListPage> {
     }
   }
 
+  void onDelete(Todo todo) {
+    setState(() {
+      todos.remove(todo);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,15 +45,22 @@ class _ListPageState extends State<ListPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Text(
+                "Lista De Tarefas",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 30,
+                ),
+              ),
               Row(
                 children: [
                   Expanded(
                     child: TextField(
-                      onSubmitted: (String value){
-                        if(value.isNotEmpty) {
+                      onSubmitted: (String value) {
+                        if (value.isNotEmpty) {
                           setState(() {
-                            Todo newTodo = Todo(
-                                title: value, date: DateTime.now());
+                            Todo newTodo =
+                                Todo(title: value, date: DateTime.now());
                             todos.add(newTodo);
                             todosController.clear();
                           });
@@ -94,12 +105,14 @@ class _ListPageState extends State<ListPage> {
                 height: 16,
               ),
               Flexible(
-      
                 child: ListView(
                   shrinkWrap: true,
                   children: [
                     for (Todo todo in todos)
-                      TodoListItem(todo:todo),
+                      TodoListItem(
+                        todo: todo,
+                        onDelete: onDelete,
+                      ),
                   ],
                 ),
               ),
@@ -142,5 +155,4 @@ class _ListPageState extends State<ListPage> {
       ),
     );
   }
-
 }
