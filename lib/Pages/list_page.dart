@@ -61,39 +61,41 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  void showDeletrTodosConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Limpar Tudo!',
-          style: TextStyle(color: Colors.white54),
-        ),
-        content: Text(
-          'Você tem certeza que deseja apagar TODAS as tarefas?',
-          style: TextStyle(color: Colors.white54),
-        ),
-        actions: [
-          TextButton(
-            onPressed: (){
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancelar',style: TextStyle(color: Colors.blueAccent),),
+  void showDeletTodosConfirmationDialog() {
+    if(todos.isNotEmpty){
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.black,
+          title: Text(
+            'Limpar Tudo!',
+            style: TextStyle(color: Colors.white54),
           ),
-          TextButton(
-            onPressed: (){
-              setState(() {
+          content: Text(
+            'Você tem certeza que deseja apagar TODAS as tarefas?',
+            style: TextStyle(color: Colors.white54),
+          ),
+          actions: [
+            TextButton(
+              onPressed: (){
                 Navigator.of(context).pop();
-                todos.clear();
-              });
+              },
+              child: Text('Cancelar',style: TextStyle(color: Colors.blueAccent),),
+            ),
+            TextButton(
+              onPressed: (){
+                setState(() {
+                  Navigator.of(context).pop();
+                  todos.clear();
+                });
 
-            },
-            child: Text('Limpar Tudo',style: TextStyle(color: Colors.red),),
-          ),
-        ],
-      ),
-    );
+              },
+              child: Text('Limpar Tudo',style: TextStyle(color: Colors.red),),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -200,9 +202,9 @@ class _ListPageState extends State<ListPage> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: showDeletrTodosConfirmationDialog,
+                    onPressed: showDeletTodosConfirmationDialog,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
+                      backgroundColor: todos.isNotEmpty? Colors.purple :Colors.white12 ,
                       padding: EdgeInsets.all(10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
