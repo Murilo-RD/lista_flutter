@@ -28,10 +28,72 @@ class _ListPageState extends State<ListPage> {
     }
   }
 
+  Todo? deletedTodo;
+  int? deletedTodoPos;
+
   void onDelete(Todo todo) {
+    deletedTodo = todo;
+    deletedTodoPos = todos.indexOf(todo);
     setState(() {
       todos.remove(todo);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Tarefa (${todo.title}) foi removida com sucesso',
+          style: TextStyle(
+            color: Colors.white54,
+          ),
+        ),
+        backgroundColor: Colors.white12,
+        action: SnackBarAction(
+          label: 'Desfazer',
+          textColor: Colors.red,
+          onPressed: () {
+            setState(() {
+              todos.insert(deletedTodoPos!, deletedTodo!);
+            });
+          },
+        ),
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  void showDeletrTodosConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.black,
+        title: Text(
+          'Limpar Tudo!',
+          style: TextStyle(color: Colors.white54),
+        ),
+        content: Text(
+          'Você tem certeza que deseja apagar TODAS as tarefas?',
+          style: TextStyle(color: Colors.white54),
+        ),
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancelar',style: TextStyle(color: Colors.blueAccent),),
+          ),
+          TextButton(
+            onPressed: (){
+              setState(() {
+                Navigator.of(context).pop();
+                todos.clear();
+              });
+
+            },
+            child: Text('Limpar Tudo',style: TextStyle(color: Colors.red),),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -45,12 +107,20 @@ class _ListPageState extends State<ListPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                "Lista De Tarefas",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 30,
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  "Lista De Tarefas",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 30,
+                  ),
                 ),
+              ),
+              SizedBox(
+                height: 16,
               ),
               Row(
                 children: [
@@ -130,11 +200,7 @@ class _ListPageState extends State<ListPage> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        todos.clear();
-                      });
-                    },
+                    onPressed: showDeletrTodosConfirmationDialog,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple,
                       padding: EdgeInsets.all(10),
