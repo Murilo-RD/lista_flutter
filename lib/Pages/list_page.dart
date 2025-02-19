@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lista/Repositorie/todo_repository.dart';
 
 import '../Models/todo.dart';
 import '../widgets/todo_list_item.dart';
@@ -14,7 +15,7 @@ class ListPage extends StatefulWidget {
 
 class _ListPageState extends State<ListPage> {
   final TextEditingController todosController = TextEditingController();
-
+  final TodoRepository todoRepository = TodoRepository();
   List<Todo> todos = [];
 
   void todoAdd() {
@@ -23,11 +24,18 @@ class _ListPageState extends State<ListPage> {
       setState(() {
         Todo newTodo = Todo(title: text, date: DateTime.now());
         todos.add(newTodo);
+        errorText = null;
       });
       todosController.clear();
+      todoRepository.saveTodoList(todos);
+    } else {
+      setState(() {
+        errorText = 'O Titulo eta vazio!';
+      });
     }
   }
 
+  String? errorText;
   Todo? deletedTodo;
   int? deletedTodoPos;
 
@@ -37,6 +45,8 @@ class _ListPageState extends State<ListPage> {
     setState(() {
       todos.remove(todo);
     });
+
+    todoRepository.saveTodoList(todos);
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -54,6 +64,7 @@ class _ListPageState extends State<ListPage> {
             setState(() {
               todos.insert(deletedTodoPos!, deletedTodo!);
             });
+            todoRepository.saveTodoList(todos);
           },
         ),
         duration: const Duration(seconds: 5),
@@ -62,7 +73,7 @@ class _ListPageState extends State<ListPage> {
   }
 
   void showDeletTodosConfirmationDialog() {
-    if(todos.isNotEmpty){
+    if (todos.isNotEmpty) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -77,25 +88,39 @@ class _ListPageState extends State<ListPage> {
           ),
           actions: [
             TextButton(
-              onPressed: (){
+              onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancelar',style: TextStyle(color: Colors.blueAccent),),
+              child: Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.blueAccent),
+              ),
             ),
             TextButton(
-              onPressed: (){
+              onPressed: () {
                 setState(() {
                   Navigator.of(context).pop();
                   todos.clear();
+                  todoRepository.saveTodoList(todos);
                 });
-
               },
-              child: Text('Limpar Tudo',style: TextStyle(color: Colors.red),),
+              child: Text(
+                'Limpar Tudo',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           ],
         ),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    todoRepository.getTodoList().then((value) {
+      todos = value;
+    });
   }
 
   @override
@@ -135,12 +160,24 @@ class _ListPageState extends State<ListPage> {
                                 Todo(title: value, date: DateTime.now());
                             todos.add(newTodo);
                             todosController.clear();
+                            todoRepository.saveTodoList(todos);
+                            errorText = null;
+                          });
+                        } else {
+                          setState(() {
+                            errorText = 'O Titulo eta vazio!';
                           });
                         }
                       },
                       controller: todosController,
                       style: TextStyle(color: Colors.white54),
                       decoration: InputDecoration(
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.purple,
+                          ),
+                        ),
+                        errorText: errorText,
                         border: OutlineInputBorder(),
                         counterStyle: TextStyle(color: Colors.white),
                         labelText: 'Adicione Uma Tarefa',
@@ -204,7 +241,8 @@ class _ListPageState extends State<ListPage> {
                   ElevatedButton(
                     onPressed: showDeletTodosConfirmationDialog,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: todos.isNotEmpty? Colors.purple :Colors.white12 ,
+                      backgroundColor:
+                          todos.isNotEmpty ? Colors.purple : Colors.white12,
                       padding: EdgeInsets.all(10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
