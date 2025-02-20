@@ -118,8 +118,12 @@ class _ListPageState extends State<ListPage> {
   @override
   void initState() {
     super.initState();
+
     todoRepository.getTodoList().then((value) {
-      todos = value;
+      setState(() {
+        todos = value;
+      });
+
     });
   }
 
